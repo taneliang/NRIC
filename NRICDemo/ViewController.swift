@@ -53,13 +53,13 @@ class ViewController: NSViewController, NSTextFieldDelegate {
     func recalculateCheckDigit() {
         let digits = numberField.stringValue.characters.flatMap { Int(String($0)) }
         if let prefixChar = prefixSelector.title.characters.first,
-            prefix = NRIC.Prefix(rawValue: prefixChar),
-            nric = try? NRIC(prefix: prefix, digits: digits) {
+            let prefix = NRIC.Prefix(rawValue: prefixChar),
+            let nric = try? NRIC(prefix: prefix, digits: digits) {
             
             checkDigitLabel.stringValue = String(nric.checkDigit)
             self.nric = nric
             copyButton.isEnabled = true
-            copyButton.title = "Copy " + String(nric)
+            copyButton.title = "Copy " + String(describing: nric)
         } else {
             checkDigitLabel.stringValue = ""
             nric = nil
@@ -73,7 +73,7 @@ class ViewController: NSViewController, NSTextFieldDelegate {
             print("hohoho")
             let pasteboard = NSPasteboard.general()
             pasteboard.declareTypes([NSPasteboardTypeString], owner: nil)
-            pasteboard.setString(String(nric), forType: NSPasteboardTypeString)
+            pasteboard.setString(String(describing: nric), forType: NSPasteboardTypeString)
         }
     }
 }

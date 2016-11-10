@@ -28,7 +28,7 @@ import Foundation
 /// An NRIC number.
 struct NRIC {
     
-    enum Error: ErrorProtocol {
+    enum NRICError: Error {
         /// Invalid NRIC length or invalid the number of digits.
         ///
         /// A complete NRIC should have 9 characters, consisting of 2 letters and 7 digits.
@@ -71,7 +71,7 @@ struct NRIC {
         if digits.count == 7 {
             self.digits = digits
         } else {
-            throw Error.lengthError
+            throw NRICError.lengthError
         }
         
         // Get or calculate check digit
@@ -90,13 +90,13 @@ struct NRIC {
     init(NRICString: String) throws {
         // Length
         if NRICString.characters.count != 9 {
-            throw Error.lengthError
+            throw NRICError.lengthError
         }
         
         // Structure
-        let regex = try? RegularExpression(pattern: "^[STFG][0-9]{7}[ABCDEFGHIKJLMNPQRTUWXZ]$", options: .allowCommentsAndWhitespace)
-        if let regex = regex where regex.numberOfMatches(in: NRICString, options: .reportCompletion, range: NSRange(location: 0,length: 9)) != 1 {
-            throw Error.invalidCharacterError
+        let regex = try? NSRegularExpression(pattern: "^[STFG][0-9]{7}[ABCDEFGHIKJLMNPQRTUWXZ]$", options: .allowCommentsAndWhitespace)
+        if let regex = regex, regex.numberOfMatches(in: NRICString, options: .reportCompletion, range: NSRange(location: 0,length: 9)) != 1 {
+            throw NRICError.invalidCharacterError
         }
         
         // NRICString is valid
@@ -106,7 +106,7 @@ struct NRIC {
         if let prefix = Prefix(rawValue: characters.first!) {
             self.prefix = prefix
         } else {
-            throw Error.prefixError
+            throw NRICError.prefixError
         }
         
         // Get digits
@@ -115,7 +115,7 @@ struct NRIC {
         if digits.count == 7 {
             self.digits = digits
         } else {
-            throw Error.lengthError
+            throw NRICError.lengthError
         }
         
         // Get check digit
@@ -131,7 +131,7 @@ struct NRIC {
     /// - returns: The check digit.
     static func calculatedCheckDigit(prefix: Prefix, digits: [Int]) throws -> Character {
         guard digits.count == 7 else {
-            throw Error.lengthError
+            throw NRICError.lengthError
         }
         
         // d0 = 0 if prefix is S or F, otherwise d0 = 4 if prefix is T or G
